@@ -3,9 +3,9 @@ import { appleEaten } from "./apple.js"
 
 export let headX = 20
 export let headY = 20
-let direction = [0, 0]
+export let direction = [0, 0]
 let snakeLength = 1
-let snakeBody = [[20, 20]]
+export let snakeBody = []
 
 window.addEventListener("keydown", e => {
   if (e.key == "ArrowUp")
@@ -19,6 +19,7 @@ window.addEventListener("keydown", e => {
 })
 
 export function drawSnake() {
+  console.log("DRAW")
   if (appleEaten())
     snakeLength++
   moveSnake()
@@ -27,6 +28,7 @@ export function drawSnake() {
   ctx.fillRect(headX * TILE_X_SIZE, headY * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
 }
 export function removeSnakePart() {
+  console.log("REMOVE")
   if (snakeLength < snakeBody.length) {
     let tail = snakeBody.shift()
     ctx.fillStyle = "black"
@@ -43,7 +45,7 @@ function changeDirection(direct) {
   else if (direct === "left")
     direction = [-1, -0]
 }
-function moveSnake() {
+export function moveSnake() {
   headX += direction[0]
   headY += direction[1]
 }

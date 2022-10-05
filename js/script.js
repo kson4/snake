@@ -27,19 +27,27 @@ ctx.fillStyle = "black"
 ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 let start = false
 
-function main(currentTime) {
+async function main(currentTime) {
   // debugger
-  window.requestAnimationFrame(main)
-  const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000
-  if (secondsSinceLastRender < 1 / SPEED) return
-  lastRenderTime = currentTime
-  drawSnake()
-  // removeSnakePart()
-  drawApple()
   if (!start) {
-    initializeSimple(headX, headY, appleX, appleY)
-    start = true
+    window.requestAnimationFrame(main)
+    const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000
+    if (secondsSinceLastRender < 1 / SPEED) return
+    lastRenderTime = currentTime
+    drawSnake()
+    // removeSnakePart()
+    drawApple()
+    console.log(1)
   }
+  
+  if (!start) {
+    start = true
+    initializeSimple(headX, headY, appleX, appleY)
+  }
+  // console.log(secondsSinceLastRender)
+  // const algo = await initializeSimple(headX, headY, appleX, appleY)
+  // console.log(algo)
+  // console.log(secondsSinceLastRender)
 }
 
 window.requestAnimationFrame(main)
