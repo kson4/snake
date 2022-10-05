@@ -1,7 +1,8 @@
 import { TILE_X_SIZE, TILE_Y_SIZE, ctx } from "./script.js"
+import { appleEaten } from "./apple.js"
 
-let headX = 10
-let headY = 11
+export let headX = 10
+export let headY = 11
 let direction = [0, 0]
 let snakeLength = 1
 let snakeBody = [[10, 10]]
@@ -20,6 +21,9 @@ window.addEventListener("keydown", e => {
 })
 
 export function drawSnake() {
+  // console.log(snakeLength)
+  if (appleEaten())
+    snakeLength++
   moveSnake()
   snakeBody.push([headX, headY])
   ctx.fillStyle = "green"

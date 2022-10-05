@@ -1,4 +1,5 @@
 import { drawSnake, removeSnakePart } from "./snake.js"
+import { drawApple } from "./apple.js"
 const GAME_WIDTH = 500
 const GAME_HEIGHT = 500
 const ROWS = 50
@@ -22,6 +23,7 @@ function main(currentTime) {
   lastRenderTime = currentTime
   drawSnake()
   removeSnakePart()
+  drawApple()
 }
 
 function initializeBoard() {
