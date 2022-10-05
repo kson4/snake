@@ -19,7 +19,6 @@ window.addEventListener("keydown", e => {
 })
 
 export function drawSnake() {
-  console.log("DRAW")
   if (appleEaten())
     snakeLength++
   moveSnake()
@@ -28,7 +27,6 @@ export function drawSnake() {
   ctx.fillRect(headX * TILE_X_SIZE, headY * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
 }
 export function removeSnakePart() {
-  console.log("REMOVE")
   if (snakeLength < snakeBody.length) {
     let tail = snakeBody.shift()
     ctx.fillStyle = "black"

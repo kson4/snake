@@ -37,7 +37,6 @@ async function main(currentTime) {
     drawSnake()
     // removeSnakePart()
     drawApple()
-    console.log(1)
   }
   
   if (!start) {

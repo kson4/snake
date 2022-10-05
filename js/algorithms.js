@@ -41,51 +41,21 @@ let headX
 let headY
 
 export async function initializeSimple(_headX, _headY, _appleX, _appleY) {
-  console.log("WTF")
   appleX = _appleX
   appleY = _appleY
   headX = _headX
   headY = _headY
   pq.enqueue([headX, headY], calcSimple(headX, headY, appleX, appleY))
-  ctx.fillStyle = "red"
+  // ctx.fillStyle = "red"
 
   await simple()
   await displayPath(0, simplePath)
-  await test(0)
-  // await 
-  console.log(simplePath)
   await travelPath()
-  await reset()
-
-  // simple()
-  //   .then(() => {
-  //     console.log("simple is done")
-  //     displayPath(0, simplePath).then(console.log("check"))
-  //       // .then(travelPath)
-  //   })
+  reset()
 }
 function calcSimple(headX, headY, appleX, appleY) {
   return Math.sqrt(Math.pow(headX - appleX, 2) + Math.pow(headY - appleY, 2))
 }
-
-function test(i) {
-  return new Promise((res) => {
-    if (i < 10) {
-      console.log(i)
-      setTimeout(() => {
-        res(test(i + 1))
-      }, 50)
-    }
-    else {
-      res()
-    }
-  })
-}
-
-function test2() {
-  console.log("initial is done")
-}
-
 
 function simple() {
   return new Promise((res) => {
@@ -119,41 +89,6 @@ function simple() {
       }
     }, 50)
   })
-
-
-  // let cur = pq.dequeue()
-  // let x = cur[0][0]
-  // let y = cur[0][1]
-  // let dist = cur[1]
-  // simplePath.push([x,y])
-  // ctx.fillStyle = "red"
-  // ctx.fillRect(x * TILE_X_SIZE, y * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
-  // if (x === appleX && y === appleY) {
-  //   console.log("FOUND")
-  //   return new Promise((res) => {
-  //     displayPath(0, simplePath)
-  //     .then(reset(0))
-  //     .then(travelPath())
-  //     res()
-  //   })
-    
-  // }
-  // closed.add(x + " " + y)
-  // let neighbors = availableCells(x, y)
-  // neighbors.forEach((neighbor) => {
-  //   ctx.fillStyle = "gray"
-  //   ctx.fillRect(neighbor[0] * TILE_X_SIZE, neighbor[1] * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
-  //   pq.enqueue(neighbor, calcSimple(neighbor[0], neighbor[1], appleX, appleY))
-  // })
-  // ctx.fillStyle = "red"
-  // ctx.fillRect(appleX * TILE_X_SIZE, appleY * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
-  // setTimeout(() => {
-  //   ctx.fillStyle = "gray"
-  //   ctx.fillRect(x * TILE_X_SIZE, y * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
-  //   if (pq.length() > 0) {
-  //     simple()
-  //   }
-  // }, 100)
 }
 
 function availableCells(x, y) {
@@ -170,7 +105,6 @@ function availableCells(x, y) {
 }
 
 function displayPath(idx, path) {
-  console.log(idx)
   return new Promise((res) => {
     ctx.fillStyle = "red"
     ctx.fillRect(path[idx][0] * TILE_X_SIZE, path[idx][1] * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
@@ -215,7 +149,25 @@ function travelPath() {
   })
 }
 
-function reset(idx) {
-  
-  console.log(closed)
+function reset() {
+  ctx.fillStyle = "black"
+  // console.log(pq.length())
+  console.log(snakeBody)
+  for (let i = 0; i < snakeBody.length; i++) {
+    pq.dequeue()
+  }
+  while (pq.length() > 0) {
+    let cur = pq.dequeue()
+    console.log(cur)
+    let x = cur[0][0]
+    let y = cur[0][1]
+    console.log(x, y)
+    if (!snakeBody.includes([x, y])) {
+      ctx.fillRect(x * TILE_X_SIZE, y * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
+    }
+    else {
+      console.log("ON SNAKE BODY ~~~~~~")
+      console.log(snakeBody, x, y, `[${x}, ${y}]`)
+    }
+  }
 }
