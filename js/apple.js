@@ -11,7 +11,11 @@ export let appleX = Math.floor(Math.random() * _ROWS)
 export let appleY = Math.floor(Math.random() * _COLS)
 // export let appleX = 20
 // export let appleY = 20
-let renderedApple = false
+export let renderedApple = false
+
+export function renderNewApple() {
+  renderedApple = false
+}
 
 export function drawApple() {
   if (!renderedApple) {
@@ -26,6 +30,7 @@ export function drawApple() {
 
 export function appleEaten() {
   if (appleX === headX && appleY === headY) {
+    console.log("APPLE WAS EATEN!!!!!!!!!!!!!!!!!!!")
     renderedApple = false
     return true
   }

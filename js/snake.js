@@ -4,7 +4,7 @@ import { appleEaten } from "./apple.js"
 export let headX = 20
 export let headY = 20
 export let direction = [0, 0]
-let snakeLength = 1
+export let snakeLength = 1
 export let snakeBody = []
 
 window.addEventListener("keydown", e => {
@@ -18,9 +18,14 @@ window.addEventListener("keydown", e => {
     changeDirection("left")
 })
 
+export function increaseSnakeLength() {
+  snakeLength++
+}
+
 export function drawSnake() {
-  if (appleEaten())
+  if (appleEaten()) {
     snakeLength++
+  }
   moveSnake()
   snakeBody.push([headX, headY])
   ctx.fillStyle = "green"

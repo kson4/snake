@@ -1,6 +1,6 @@
-import { drawApple } from "./apple.js"
+import { appleEaten, drawApple, renderNewApple } from "./apple.js"
 import { TILE_X_SIZE, TILE_Y_SIZE, ctx, ROWS, COLS, GAME_HEIGHT, GAME_WIDTH } from "./script.js"
-import { drawSnake, direction, removeSnakePart, snakeBody } from "./snake.js"
+import { drawSnake, direction, removeSnakePart, snakeBody, increaseSnakeLength } from "./snake.js"
 
 class PriorityQueue {
   constructor() {
@@ -40,18 +40,34 @@ let appleY
 let headX
 let headY
 
-export async function initializeSimple(_headX, _headY, _appleX, _appleY) {
-  appleX = _appleX
-  appleY = _appleY
-  headX = _headX
-  headY = _headY
-  pq.enqueue([headX, headY], calcSimple(headX, headY, appleX, appleY))
-  // ctx.fillStyle = "red"
+let idx = 0
 
-  await simple()
-  await displayPath(0, simplePath)
-  await travelPath()
-  reset()
+export async function initializeSimple(_headX, _headY, _appleX, _appleY) {
+  console.log("APPLE: ", appleX, appleY)
+  if (idx < 3) {
+    console.log(pq)
+    appleX = _appleX
+    appleY = _appleY
+    headX = _headX
+    headY = _headY
+    console.log(headX, headY, appleX, appleY)
+    pq.enqueue([headX, headY], calcSimple(headX, headY, appleX, appleY))
+    await simple()
+    await displayPath(0, simplePath)
+    await travelPath()
+    reset()
+    increaseSnakeLength()
+    renderNewApple()
+    let appleXY = drawApple()
+    console.log(appleXY)
+    appleX = appleX[0]
+    appleY = appleY[1]
+  }
+  setTimeout(() => {
+    
+    console.log(headX, headY, appleX, appleY)
+    initializeSimple(headX, headY, appleX, appleY)
+  }, 5000)
 }
 function calcSimple(headX, headY, appleX, appleY) {
   return Math.sqrt(Math.pow(headX - appleX, 2) + Math.pow(headY - appleY, 2))
@@ -151,22 +167,18 @@ function travelPath() {
 
 function reset() {
   ctx.fillStyle = "black"
-  // console.log(pq.length())
   console.log(snakeBody)
   for (let i = 0; i < snakeBody.length; i++) {
     pq.dequeue()
   }
   while (pq.length() > 0) {
     let cur = pq.dequeue()
-    console.log(cur)
     let x = cur[0][0]
     let y = cur[0][1]
-    console.log(x, y)
     if (!snakeBody.includes([x, y])) {
       ctx.fillRect(x * TILE_X_SIZE, y * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
     }
     else {
-      console.log("ON SNAKE BODY ~~~~~~")
       console.log(snakeBody, x, y, `[${x}, ${y}]`)
     }
   }
