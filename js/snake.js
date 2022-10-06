@@ -1,54 +1,46 @@
-import { TILE_X_SIZE, TILE_Y_SIZE, ctx } from "./script.js"
-import { appleEaten } from "./apple.js"
+import { ctx } from "./script.js"
 
-export let headX = 20
-export let headY = 20
-export let direction = [0, 0]
-export let snakeLength = 1
-export let snakeBody = []
-
-window.addEventListener("keydown", e => {
-  if (e.key == "ArrowUp")
-    changeDirection("up")
-  else if (e.key == "ArrowRight")
-    changeDirection("right")
-  else if (e.key == "ArrowDown")
-    changeDirection("down")
-  else if (e.key == "ArrowLeft")
-    changeDirection("left")
-})
-
-export function increaseSnakeLength() {
-  snakeLength++
-}
-
-export function drawSnake() {
-  if (appleEaten()) {
-    snakeLength++
+export class Snake {
+  constructor(xSize, ySize) {
+    this.x = 10
+    this.y = 10
+    this.direction = [0, 0]
+    this.length = 1
+    this.body = []
+    this.xSize = xSize
+    this.ySize = ySize
   }
-  moveSnake()
-  snakeBody.push([headX, headY])
-  ctx.fillStyle = "green"
-  ctx.fillRect(headX * TILE_X_SIZE, headY * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
-}
-export function removeSnakePart() {
-  if (snakeLength < snakeBody.length) {
-    let tail = snakeBody.shift()
-    ctx.fillStyle = "black"
-    ctx.fillRect(tail[0] * TILE_X_SIZE, tail[1] * TILE_Y_SIZE, TILE_X_SIZE, TILE_Y_SIZE)
+  draw() {
+    this.body.push([this.x, this.y])
+    ctx.fillStyle = "green"
+    ctx.fillRect(this.x * this.xSize, this.y * this.ySize, this.xSize, this.ySize)
+    if (this.length < this.body.length) {
+      let tail = this.body.shift()
+      ctx.fillStyle = "black"
+      ctx.fillRect(tail[0] * this.xSize, tail[1] * this.ySize, this.xSize, this.ySize)
+    }
   }
-}
-function changeDirection(direct) {
-  if (direct === "up")
-    direction = [0, -1]
-  else if (direct === "right")
-    direction = [1, 0]
-  else if (direct === "down")
-    direction = [0, 1]
-  else if (direct === "left")
-    direction = [-1, -0]
-}
-export function moveSnake() {
-  headX += direction[0]
-  headY += direction[1]
+  move() {
+    this.x += this.direction[0]
+    this.y += this.direction[1]
+  }
+  changeDirection(direction) {
+    if (direction === "up")
+      this.direction = [0, -1]
+    else if (direction === "right")
+      this.direction = [1, 0]
+    else if (direction === "down")
+      this.direction = [0, 1]
+    else if (direction === "left")
+      this.direction = [-1, -0]
+  }
+  increaseLength() {
+    this.length++
+    let tailX = this.x - this.direction[0]
+    let tailY = this.y - this.direction[1]
+    console.log(this.x, this.y, tailX, tailY)
+    this.body.push([tailX, tailY])
+    ctx.fillStyle = "green"
+    ctx.fillRect(tailX * this.xSize, tailY * this.ySize, this.xSize, this.ySize)
+  }
 }
