@@ -15,8 +15,8 @@
   gap: 1px;
 }
 .cell {
-  width: 10px;
-  height: 10px;
+  width: 25px;
+  height: 25px;
   border: 1px solid red;
 }
 .green {

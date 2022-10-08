@@ -1,4 +1,7 @@
-import { TILE_X_SIZE, TILE_Y_SIZE, ctx, ROWS, COLS, GAME_HEIGHT, GAME_WIDTH, snake, apple } from "./script.js"
+import { snake } from "./snake.js"
+import { apple } from "./apple.js"
+import { ctx, board, TILE_X_SIZE, TILE_Y_SIZE, ROWS, COLS } from "./board.js"
+
 
 class PriorityQueue {
   constructor() {
@@ -57,14 +60,13 @@ export async function startSimple() {
   await simple()
   // await displayPath(0, simplePath)
   await travelPath()
-  snake.increaseLength()
+  snake.increaseLength(board.availableSpots)
 }
 function calcSimple(headX, headY, appleX, appleY) {
   return Math.sqrt(Math.pow(headX - apple.x, 2) + Math.pow(headY - apple.y, 2))
 }
 
 export function simple() {
-  console.log("RENDER")
   return new Promise((res) => {
     let cur = pq.dequeue()
     let x = cur[0][0]
@@ -141,7 +143,7 @@ function travelPath() {
     snake.x += simplePath[1][0] - simplePath[0][0]
     snake.y += simplePath[1][1] - simplePath[0][1]
     simplePath.shift()
-    snake.draw()
+    snake.draw(board.availableSpots)
     setTimeout(() => {
       if (simplePath.length > 1) {
         res(travelPath())
@@ -151,13 +153,6 @@ function travelPath() {
       }
     // }, 50)
     }, 25)
-  })
-}
-
-function reset(idx) {
-  return new Promise((res) => {
-    ctx.fillStyle = "black"
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
   })
 }
 

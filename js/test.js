@@ -1,11 +1,12 @@
-const ROWS = 10
-const COLS = 10
+const ROWS = 50
+const COLS = 50
 
 class Board {
   constructor(rows, cols) {
     this.rows = rows
     this.cols = cols
     this.availableCells = new Set()
+    this.resetTiles = new Set()
   }
   initialize(board) {
     for (let i = 0; i < this.rows; i++) {
@@ -19,6 +20,12 @@ class Board {
         this.availableCells.add(`r${i}c${j}`)
       }
       board.appendChild(row)
+    }
+  }
+  reset() {
+    const toArray = Array.from(this.resetTiles)
+    for (let i = 0; i < toArray.length; i++) {
+      const cell = document.querySelector(toArray[i]).classList.remove("traveled")
     }
   }
 }
@@ -40,7 +47,7 @@ class Snake {
     this.body.push(`r${this.x}c${this.y}`)
     if (this.length < this.body.length) {
       const cell = this.body.shift()
-      console.log(availableCells)
+      // console.log(availableCells)
       document.querySelector(`#${cell}`).classList.remove("snake")
       availableCells.add(cell)
     }
@@ -58,19 +65,17 @@ class Snake {
   walkPath() {
     return new Promise((res) => {
       let coordinates = this.aiPath.shift()
-      console.log(coordinates)
+      // console.log(coordinates)
       const head = document.querySelector(`#r${coordinates[0]}c${coordinates[1]}`)
       head.classList.remove("traveled")
       head.style.backgroundColor = ""
       head.classList.add("snake")
-      console.log(head.classList)
+      // console.log(head.classList)
       this.body.push(`r${coordinates[0]}c${coordinates[1]}`)
-      console.log(this.body)
+      // console.log(this.body)
       // console.log(head)
       if (this.length < this.body.length) {
         const cell = this.body.shift()
-        console.log(cell)
-        console.log(document.querySelector(`#${cell}`))
         document.querySelector(`#${cell}`).classList.remove("snake")
         document.querySelector(`#${cell}`).classList.remove("traveled")
       }
@@ -81,9 +86,11 @@ class Snake {
         else {
           apple.draw(board.availableCells)
           this.length++
+          this.x = coordinates[0]
+          this.y = coordinates[1]
           res()
         }
-      }, 100)
+      }, 25)
     })
     
   }
@@ -150,32 +157,64 @@ snake.draw(board.availableCells)
 export const apple = new Apple()
 apple.draw(board.availableCells)
 
-// window.addEventListener("keydown", e => {
-//   if (e.key == "ArrowUp")
-//     snake.changeDirection("up")
-//   else if (e.key == "ArrowRight")
-//     snake.changeDirection("right")
-//   else if (e.key == "ArrowDown")
-//     snake.changeDirection("down")
-//   else if (e.key == "ArrowLeft")
-//     snake.changeDirection("left")
-//   snake.draw(board.availableCells)
-// })
+// let open = new PriorityQueue()
+// open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
+//   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
 
-console.log(snake.x, snake.y, apple.x, apple.y)
+// let openSet = new Set()
+// let closedSet = new Set()
 
+// let node = await aStar()
+// console.log(node)
+// // console.log(node(res))
+// await displayPath(node)
+// await snake.walkPath()
+// board.reset()
+
+// open = new PriorityQueue()
+// open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
+//   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
+
+// openSet = new Set()
+// closedSet = new Set()
+
+// node = await aStar()
+// console.log(node)
+// await displayPath(node)
+// await snake.walkPath()
+// board.reset()
+
+// open = new PriorityQueue()
+// open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
+//   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
+
+// openSet = new Set()
+// closedSet = new Set()
+
+// node = await aStar()
+// console.log(node)
+// await displayPath(node)
+// await snake.walkPath()
+// board.reset()
 let open = new PriorityQueue()
-open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
-  aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
+let openSet = new Set()
+let closedSet = new Set()
+let node
 
-const openSet = new Set()
-const closedSet = new Set()
+for (let i = 0; i < 5; i++) {
+  open = new PriorityQueue()
+  open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
+    aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
 
-const node = await aStar()
-console.log(node)
-// console.log(node(res))
-await displayPath(node)
-await snake.walkPath()
+  openSet = new Set()
+  closedSet = new Set()
+
+  node = await aStar()
+  console.log(node)
+  await displayPath(node)
+  await snake.walkPath()
+  board.reset()
+}
 
 export function aStar() {
   return new Promise((res) => {
@@ -185,7 +224,12 @@ export function aStar() {
     let h = cell[2]
     let x = cell[3]
     let y = cell[4]
-    document.querySelector(`#r${x}c${y}`).classList.add("traveled")
+
+    const check = document.querySelector(`#r${x}c${y}`)
+    if (!check.classList.contains("apple") || !check.classList.contains("snake")) {
+      document.querySelector(`#r${x}c${y}`).classList.add("traveled")
+    }
+    board.resetTiles.add(`#r${x}c${y}`)
     openSet.add(`${x} ${y}`)
     closedSet.add(`${x} ${y}`)
     let neighbors = getNeighbors(x, y)
@@ -206,14 +250,10 @@ export function aStar() {
         res(aStar())
       }
       else {
-        console.log("ENDING: ")
-        console.log(cell, cell[3], cell[4])
-        console.log(apple.x, apple.y)
         res(cell)
       }
-    }, 250)
+    }, 25)
   })
-  
 }
 function aStarCalc(x, y, x2, y2) {
   return Math.pow(x - x2, 2) + Math.pow(y - y2, 2)
@@ -236,7 +276,11 @@ function getNeighbors(x, y) {
 }
 function displayPath(cell) {
   return new Promise((res) => {
-    console.log(cell)
+    // console.log(cell)
+    // const check = document.querySelector(`#r${cell[3]}c${cell[4]}`)
+    // console.log(check.classList)
+    // if (!check.classList.contains("apple") || !check.classList.contains("snake"))
+    //   document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
     document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
     snake.aiPath.unshift([cell[3], cell[4]])
     setTimeout(() => {
@@ -246,7 +290,18 @@ function displayPath(cell) {
       else {
         res()
       }
-    }, 50)
+    }, 25)
   })
- 
 }
+
+// window.addEventListener("keydown", e => {
+//   if (e.key == "ArrowUp")
+//     snake.changeDirection("up")
+//   else if (e.key == "ArrowRight")
+//     snake.changeDirection("right")
+//   else if (e.key == "ArrowDown")
+//     snake.changeDirection("down")
+//   else if (e.key == "ArrowLeft")
+//     snake.changeDirection("left")
+//   snake.draw(board.availableCells)
+// })
