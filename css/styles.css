@@ -22,3 +22,13 @@
 .green {
   background-color: green;
 }
+
+.snake {
+  background-color: green;
+}
+.apple {
+  background-color: red;
+}
+.traveled {
+  background-color: gray;
+}

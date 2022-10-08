@@ -1,19 +1,25 @@
 import { ctx } from "./script.js"
-
+  
 export class Snake {
   constructor(xSize, ySize) {
-    this.x = 10
-    this.y = 10
+    this.x = 8
+    this.y = 5
     this.direction = [0, 0]
     this.length = 1
     this.body = []
     this.xSize = xSize
     this.ySize = ySize
+    
   }
   draw() {
     this.body.push([this.x, this.y])
     ctx.fillStyle = "green"
     ctx.fillRect(this.x * this.xSize, this.y * this.ySize, this.xSize, this.ySize)
+    // let img = new Image()
+    // img.src = "../player.jpg"
+    // img.onload = () => {
+    //   ctx.drawImage(img, this.x * this.xSize, this.y * this.ySize, this.xSize, this.ySize)
+    // }
     if (this.length < this.body.length) {
       let tail = this.body.shift()
       ctx.fillStyle = "black"
@@ -38,7 +44,6 @@ export class Snake {
     this.length++
     let tailX = this.x - this.direction[0]
     let tailY = this.y - this.direction[1]
-    console.log(this.x, this.y, tailX, tailY)
     this.body.push([tailX, tailY])
     ctx.fillStyle = "green"
     ctx.fillRect(tailX * this.xSize, tailY * this.ySize, this.xSize, this.ySize)
