@@ -65,15 +65,11 @@ class Snake {
   walkPath() {
     return new Promise((res) => {
       let coordinates = this.aiPath.shift()
-      // console.log(coordinates)
       const head = document.querySelector(`#r${coordinates[0]}c${coordinates[1]}`)
       head.classList.remove("traveled")
       head.style.backgroundColor = ""
       head.classList.add("snake")
-      // console.log(head.classList)
       this.body.push(`r${coordinates[0]}c${coordinates[1]}`)
-      // console.log(this.body)
-      // console.log(head)
       if (this.length < this.body.length) {
         const cell = this.body.shift()
         document.querySelector(`#${cell}`).classList.remove("snake")
@@ -157,51 +153,12 @@ snake.draw(board.availableCells)
 export const apple = new Apple()
 apple.draw(board.availableCells)
 
-// let open = new PriorityQueue()
-// open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
-//   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
-
-// let openSet = new Set()
-// let closedSet = new Set()
-
-// let node = await aStar()
-// console.log(node)
-// // console.log(node(res))
-// await displayPath(node)
-// await snake.walkPath()
-// board.reset()
-
-// open = new PriorityQueue()
-// open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
-//   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
-
-// openSet = new Set()
-// closedSet = new Set()
-
-// node = await aStar()
-// console.log(node)
-// await displayPath(node)
-// await snake.walkPath()
-// board.reset()
-
-// open = new PriorityQueue()
-// open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
-//   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
-
-// openSet = new Set()
-// closedSet = new Set()
-
-// node = await aStar()
-// console.log(node)
-// await displayPath(node)
-// await snake.walkPath()
-// board.reset()
 let open = new PriorityQueue()
 let openSet = new Set()
 let closedSet = new Set()
 let node
 
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 100; i++) {
   open = new PriorityQueue()
   open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
     aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
@@ -224,10 +181,9 @@ export function aStar() {
     let h = cell[2]
     let x = cell[3]
     let y = cell[4]
-
     const check = document.querySelector(`#r${x}c${y}`)
-    if (!check.classList.contains("apple") || !check.classList.contains("snake")) {
-      document.querySelector(`#r${x}c${y}`).classList.add("traveled")
+    if (!check.classList.contains("snake") && !check.classList.contains("apple")) {
+      document.querySelector(`#r${cell[3]}c${cell[4]}`).classList.add("traveled")
     }
     board.resetTiles.add(`#r${x}c${y}`)
     openSet.add(`${x} ${y}`)
@@ -240,7 +196,7 @@ export function aStar() {
       const nh = aStarCalc(nx, ny, apple.x, apple.y)
       const nf = parseFloat(ng) + parseFloat(nh)
       
-      if (!openSet.has(nx + " " + ny)) {
+      if (!openSet.has(nx + " " + ny) && !snake.body.includes(`r${nx}c${ny}`)) {
         open.enqueue(nf, ng, nh, nx, ny, cell)
         openSet.add(nx + " " + ny)
       }
@@ -281,7 +237,14 @@ function displayPath(cell) {
     // console.log(check.classList)
     // if (!check.classList.contains("apple") || !check.classList.contains("snake"))
     //   document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
-    document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
+    // for (let i = 0; i < snake.body.length; i++) {
+    //   console.log(snake.body[i][0], snake.body[i][1])
+    // }
+    const check = document.querySelector(`#r${cell[3]}c${cell[4]}`)
+    if (!check.classList.contains("snake") && !check.classList.contains("apple")) {
+      document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
+    }
+    
     snake.aiPath.unshift([cell[3], cell[4]])
     setTimeout(() => {
       if (cell[5] != -1) {
