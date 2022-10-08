@@ -56,31 +56,36 @@ class Snake {
       this.direction = [0, -1]
   }
   walkPath() {
-    // console.log(this.aiPath[0])
-    if (this.aiPath.length === 0) {
-      apple.draw(board.availableCells)
-      return
-    }
-    let coordinates = this.aiPath.shift()
-    console.log(coordinates)
-    const head = document.querySelector(`#r${coordinates[0]}c${coordinates[1]}`)
-    head.classList.remove("traveled")
-    head.style.backgroundColor = ""
-    head.classList.add("snake")
-    console.log(head.classList)
-    this.body.push(`r${coordinates[0]}c${coordinates[1]}`)
-    console.log(this.body)
-    // console.log(head)
-    if (this.length < this.body.length) {
-      const cell = this.body.shift()
-      console.log(cell)
-      console.log(document.querySelector(`#${cell}`))
-      document.querySelector(`#${cell}`).classList.remove("snake")
-      document.querySelector(`#${cell}`).classList.remove("traveled")
-    }
-    setTimeout(() => {
-      this.walkPath()
-    }, 50)
+    return new Promise((res) => {
+      let coordinates = this.aiPath.shift()
+      console.log(coordinates)
+      const head = document.querySelector(`#r${coordinates[0]}c${coordinates[1]}`)
+      head.classList.remove("traveled")
+      head.style.backgroundColor = ""
+      head.classList.add("snake")
+      console.log(head.classList)
+      this.body.push(`r${coordinates[0]}c${coordinates[1]}`)
+      console.log(this.body)
+      // console.log(head)
+      if (this.length < this.body.length) {
+        const cell = this.body.shift()
+        console.log(cell)
+        console.log(document.querySelector(`#${cell}`))
+        document.querySelector(`#${cell}`).classList.remove("snake")
+        document.querySelector(`#${cell}`).classList.remove("traveled")
+      }
+      setTimeout(() => {
+        if (this.aiPath.length !== 0) {
+          res(this.walkPath())
+        }
+        else {
+          apple.draw(board.availableCells)
+          this.length++
+          res()
+        }
+      }, 100)
+    })
+    
   }
 }
 class Apple {
@@ -159,49 +164,56 @@ apple.draw(board.availableCells)
 
 console.log(snake.x, snake.y, apple.x, apple.y)
 
-const open = new PriorityQueue()
+let open = new PriorityQueue()
 open.enqueue(aStarCalc(snake.x, snake.y, apple.x, apple.y), 0, 
   aStarCalc(snake.x, snake.y, apple.x,  apple.y), snake.x, snake.y, -1)
 
 const openSet = new Set()
 const closedSet = new Set()
 
-aStar()
-export function aStar() {
-  // console.log(open)
-  const cell = open.dequeue()
-  let f = cell[0]
-  let g = cell[1]
-  let h = cell[2]
-  let x = cell[3]
-  let y = cell[4]
-  // console.log(f)
-  document.querySelector(`#r${x}c${y}`).classList.add("traveled")
-  if (x == apple.x && y == apple.y) {
-    console.log("FOUND")
-    displayPath(cell)
-    return
-  }
-  openSet.add(`${x} ${y}`)
-  closedSet.add(`${x} ${y}`)
+const node = await aStar()
+console.log(node)
+// console.log(node(res))
+await displayPath(node)
+await snake.walkPath()
 
-  let neighbors = getNeighbors(x, y)
-  for (let i = 0; i < neighbors.length; i++) {
-    let nx = neighbors[i][0]
-    let ny = neighbors[i][1]
-    const ng = g + 1
-    const nh = aStarCalc(nx, ny, apple.x, apple.y)
-    const nf = parseFloat(ng) + parseFloat(nh)
-    
-    if (!openSet.has(nx + " " + ny)) {
-      open.enqueue(nf, ng, nh, nx, ny, cell)
-      openSet.add(nx + " " + ny)
+export function aStar() {
+  return new Promise((res) => {
+    const cell = open.dequeue()
+    let f = cell[0]
+    let g = cell[1]
+    let h = cell[2]
+    let x = cell[3]
+    let y = cell[4]
+    document.querySelector(`#r${x}c${y}`).classList.add("traveled")
+    openSet.add(`${x} ${y}`)
+    closedSet.add(`${x} ${y}`)
+    let neighbors = getNeighbors(x, y)
+    for (let i = 0; i < neighbors.length; i++) {
+      let nx = neighbors[i][0]
+      let ny = neighbors[i][1]
+      const ng = g + 1
+      const nh = aStarCalc(nx, ny, apple.x, apple.y)
+      const nf = parseFloat(ng) + parseFloat(nh)
+      
+      if (!openSet.has(nx + " " + ny)) {
+        open.enqueue(nf, ng, nh, nx, ny, cell)
+        openSet.add(nx + " " + ny)
+      }
     }
-  }
-  // console.log("------------------------------------------------------------------------------------")
-  setTimeout(() => {
-    aStar()
-  }, 50)
+    setTimeout(() => {
+      if (!(x == apple.x && y == apple.y)) {
+        res(aStar())
+      }
+      else {
+        console.log("ENDING: ")
+        console.log(cell, cell[3], cell[4])
+        console.log(apple.x, apple.y)
+        res(cell)
+      }
+    }, 250)
+  })
+  
 }
 function aStarCalc(x, y, x2, y2) {
   return Math.pow(x - x2, 2) + Math.pow(y - y2, 2)
@@ -223,15 +235,18 @@ function getNeighbors(x, y) {
   return neighbors
 }
 function displayPath(cell) {
-  console.log(cell)
-  if (cell[5] === -1) {
-    // snake.aiPath.shift()
-    snake.walkPath()
-    return
-  }
-  document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
-  snake.aiPath.unshift([cell[3], cell[4]])
-  setTimeout(() => {
-    displayPath(cell[5])
-  }, 50)
+  return new Promise((res) => {
+    console.log(cell)
+    document.querySelector(`#r${cell[3]}c${cell[4]}`).style.backgroundColor = "yellow"
+    snake.aiPath.unshift([cell[3], cell[4]])
+    setTimeout(() => {
+      if (cell[5] != -1) {
+        res(displayPath(cell[5]))
+      }
+      else {
+        res()
+      }
+    }, 50)
+  })
+ 
 }

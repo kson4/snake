@@ -91,7 +91,7 @@ export function simple() {
         res()
       }
     // }, 25)
-    }, 10)
+    }, 25)
   })
 }
 
@@ -131,7 +131,7 @@ function displayPath(idx, path) {
         res()
       }
     // }, 10)
-    }, 10)
+    }, 25)
   })
 }
 
